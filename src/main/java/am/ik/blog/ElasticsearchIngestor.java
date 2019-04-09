@@ -47,7 +47,7 @@ public class ElasticsearchIngestor {
             String index = "request-log-" + date.toLocalDate();
             // https://stackoverflow.com/a/51321602/5861829
             this.webClient.put()
-                .uri(b -> b.pathSegment(index, "doc", id.toString()).build())
+                .uri(index + "/doc/{id}", id)
                 .contentType(MediaType.APPLICATION_JSON)
                 .syncBody(payload)
                 .retrieve()
