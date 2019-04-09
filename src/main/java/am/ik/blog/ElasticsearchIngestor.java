@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.OffsetDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 @Component
@@ -34,13 +35,20 @@ public class ElasticsearchIngestor {
     }
 
     @StreamListener(Sink.INPUT)
-    public void injest(Message<JsonNode> message) {
+    public void ingest(Message<JsonNode> message) {
         UUID id = message.getHeaders().getId();
         JsonNode payload = message.getPayload();
         log.info("Received {}:{}", id, payload);
         if (payload.has("address") && this.props.isIgnored(payload.get("address").asText())) {
             log.info("Ignored {}", id);
             return;
+        }
+        if (payload.has("path")) {
+            String path = Objects.toString(payload.get("path").asText(), "");
+            if (path.endsWith(".png") || path.equals("/manifest.json")) {
+                log.info("Ignored {}", id);
+                return;
+            }
         }
         if (id != null && payload.has("date")) {
             OffsetDateTime date = OffsetDateTime.parse(payload.get("date").asText());
