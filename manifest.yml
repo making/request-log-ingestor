@@ -1,0 +1,10 @@
+applications:
+- name: request-log-ingestor
+  path: target/request-log-ingestor-0.0.1-SNAPSHOT.jar
+  memory: 768m
+  services:
+  - rl-kafka
+  - rl-elasticsearch
+  - rl-zipkin
+  env:
+    JBP_CONFIG_OPEN_JDK_JRE: '{ jre: { version: 11.+}}'
